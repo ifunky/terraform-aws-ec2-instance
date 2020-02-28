@@ -1,0 +1,45 @@
+<powershell>
+
+$service = 'smphost'
+if ( (Get-Service -Name $service) -ne 'Running')
+{
+    Write-Host 'SMPHOST (Microsoft Storage Spaces SMP) must be running for get-disk to work...Starting..'
+    Set-Service $service -StartupType Manual
+    Start-Service -Name $service
+}
+
+& c:\programdata\amazon\tools\ebsnvme-id.exe
+
+$deviceMappings = @()
+$deviceMapping = @{}
+
+(& c:\programdata\amazon\tools\ebsnvme-id.exe) | ForEach-Object {
+if ($_ -like '*Disk*') {
+    $values = $_.split(':')
+    $deviceMapping = [pscustomobject]@{disk_no=$values[1].Trim();vol='';device=''}
+} elseif ($_ -like '*Volume*') {
+    $values = $_.split(':')
+    $deviceMapping.vol = $values[1].Trim()
+} elseif ($_ -like '*Device*') {
+    $values = $_.split(':')
+    $deviceMapping.device = $values[1].Trim()
+    $deviceMappings += $deviceMapping
+}}
+
+# Initialise all new disks to GPT
+Get-Disk | Where partitionstyle -eq 'raw' | Initialize-Disk -PartitionStyle GPT
+
+# Set up additional volumes
+%{ for block_device in block_devices ~}
+    $device = $deviceMappings | Where-Object { $_.device -eq "${block_device.device_name}" }
+    Get-disk | Where-Object Number -Eq "$($device.disk_no)" | New-Partition -DriveLetter ${block_device.volume_letter}  -UseMaximumSize | Format-Volume -NewFileSystemLabel "${block_device.volume_name}" -confirm:$false
+%{ endfor ~}
+
+# Resync time as we have noticed on first reboot without domain join the time is wrong even though it has been configured
+W32tm /resync
+
+# Extra user defined commands
+${user_data}
+
+
+</powershell>

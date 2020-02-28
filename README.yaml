@@ -1,0 +1,58 @@
+---
+#
+# Run `make createdocs` to rebuild the `README.md`
+#
+
+# Name of this project
+name: terraform-aws-ec2-instance
+title: Create AWS EC2 Linux or Windows Servers
+
+# Build Badges
+badges:
+  - name: "Build Status"
+    image: "https://circleci.com/gh/ifunky/terraform-aws-ec2-instance.svg?style=svg"
+    url: "https://circleci.com/gh/ifunky/terraform-aws-ec2-instance"
+description: |-
+  This module creates Windows EC2 instances with extra volumes if required. 
+
+  ## Features
+
+  ### Linux/Windows Server
+
+  - Optionally set an Elastic IP (EIP)
+  - Specify an IAM role
+  - Assign security groups
+  - 1 or additionaly volumes
+
+  ### User Data
+  - Specify optional user data scripts
+
+# How to use this project
+usage: |-
+  ```hcl
+  module "ec2_myserver" {
+    source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
+
+    my_useful_thing = "${var.useful_thing}"
+
+    tags = {
+      Terraform = "true"
+    }
+  }
+  ```
+
+# Include output from terraform-module-inspect
+include:
+  - "docs/targets.md"
+  - "docs/metadata.md"
+
+# List of useful related projects/links
+related:
+  - name: "PolyDev"
+    description: "PolyDev repo and setup guide"
+    url: "https://github.com/ifunky/polydev"
+
+references:
+  - name: "AWS User Data"
+    description: "AWS official docs"
+    url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html" 

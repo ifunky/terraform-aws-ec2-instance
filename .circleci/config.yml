@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ifunky/polydev:latest
+        environment:
+          AWS_DEFAULT_REGION: eu-west-1 
+    
+    working_directory: ~/terraform
+    steps:
+      - checkout:
+          path: ~/terraform
+      - run:
+          name: Validate
+          command: make validate
