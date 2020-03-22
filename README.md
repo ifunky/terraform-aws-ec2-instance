@@ -3,9 +3,9 @@
 # Create AWS EC2 Linux or Windows Servers
 
 
- [![Build Status](https://circleci.com/gh/ifunky/terraform-aws-ec2-instance.svg?style=svg)](https://circleci.com/gh/ifunky/terraform-aws-ec2-instance)
+ [![Build Status](https://circleci.com/gh/ifunky/terraform-aws-ec2-instance.svg?style=svg)](https://circleci.com/gh/ifunky/terraform-aws-ec2-instance) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This module creates Windows EC2 instances with extra volumes if required. 
+This module creates Linux or Windows EC2 instances.
 
 ## Features
 
@@ -14,10 +14,41 @@ This module creates Windows EC2 instances with extra volumes if required.
 - Optionally set an Elastic IP (EIP)
 - Specify an IAM role
 - Assign security groups
-- 1 or additionaly volumes
+- Optionally join a domain using SSM documents (see notes below)
+- Attach 1 or more additional EBS volumes
 
 ### User Data
 - Specify optional user data scripts
+
+## Custom User Data
+Add your own server specifc user data scripts (see full example below) that will be executed after the disk intialisation.  To debug the scripts see the 
+following folder on the running instance: C:\ProgramData\Amazon\EC2-Windows\Launch\Log
+
+## Domain Joining
+In order to join a domain as part of provisioning an Active Directory and SSM document must be in place already.  
+When using AWS AD sharing a default SSM document will be created that can be used.
+
+## Block Device mapping
+This module follows the AWS conventions where by `\dev\sda1` is defined as the root device and all other ebs volumes use the recommended names `xvd[f-z] *`
+When creating addtional ebs volumes you can specify any variables as described in the Terraform docs: https://www.terraform.io/docs/providers/aws/r/instance.html#block-devices
+
+For Windows you can specify the following drive properties as well:
+- volume_letter
+- volume_name
+
+For example:
+```hcl
+ ebs_block_device = [
+            {
+              volume_letter         = "E"
+              volume_name           = "Data"
+              device_name           = "xvdg"
+              volume_type           = "gp2"
+              volume_size           = 20
+              delete_on_termination = true
+            }
+  ]
+```
 
 
 
@@ -26,7 +57,62 @@ This module creates Windows EC2 instances with extra volumes if required.
 module "ec2_myserver" {
   source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
 
-  my_useful_thing = "${var.useful_thing}"
+  key_name        = "${var.useful_thing}"
+  instance_type   = "t3a.small"
+  vpc_id          = "a-12345678"
+  security_groups = ["sg_windows"]
+  subnet          = "i-3r4t555"
+  name            = "My_Server"
+  namespace       = "ifunky"
+  stage           = "dev"
+  tags = {
+    Terraform = "true"
+  }
+}
+```
+Full example
+```hcl
+module "ec2_myserver" {
+  source = "git::https://git.fincore.com/cmp/terraform-aws-ec2-windows-instance.git?ref=master"
+
+  key_name        = var.my_key
+  instance_type   = "t3a.small"
+  vpc_id          = "a-e343434334"
+  security_groups = ["sg_windows"]
+  subnet          = "i-573443ww"
+  name            = "My_Server"
+  namespace       = "ifunky"
+  stage           = "dev"
+
+  user_data       =<<EOF
+      echo "test" > c:\windows\temp\log1.log
+      echo "test2" > c:\windows\temp\log2.log
+      EOF
+
+  join_domain               = true
+  join_domain_ssm_document  = "awsconfig_Domain_d-34343434_ifunky.com"
+  join_domain_ssm_params    = {
+    ServerName = "MyServerName"
+  }
+
+  ebs_block_device = [
+            {
+              volume_letter         = "E"
+              volume_name           = "Data"
+              device_name           = "xvdg"
+              volume_type           = "gp2"
+              volume_size           = 20
+              delete_on_termination = true
+            },
+            {
+              volume_letter         = "F"
+              volume_name          = "Logs"
+              device_name           = "xvdh"
+              volume_type           = "gp2"
+              volume_size           = 25
+              delete_on_termination = true
+            },
+            ]
 
   tags = {
     Terraform = "true"
@@ -135,5 +221,7 @@ Here are some useful related projects.
 
 For more information please see the following links of interest: 
 
-- [AWS User Data](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html) - AWS official docs
+- [AWS Windows User Data](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-user-data.html) - AWS Windows User Data guide
+- [AWS Windows Device Mapping](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html#windows-volume-mapping) - AWS Windows Volume Mapping
+- [Terraform EC2 Instance](https://www.terraform.io/docs/providers/aws/r/instance.html) - Terraform EC2 documentation
 
