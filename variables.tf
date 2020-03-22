@@ -86,6 +86,12 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
+variable "os_type" {
+  type        = string
+  description = "Type of OS. Either linux or windows"
+  default     = "linux"
+}
+
 variable "root_block_device" {
   description = "Customise root block devices of the instance"
   type        = list(map(string))
