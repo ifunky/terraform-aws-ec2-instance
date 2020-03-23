@@ -73,7 +73,7 @@ module "ec2_myserver" {
 Full example
 ```hcl
 module "ec2_myserver" {
-  source = "git::https://git.fincore.com/cmp/terraform-aws-ec2-windows-instance.git?ref=master"
+  source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
 
   key_name        = var.my_key
   instance_type   = "t3a.small"
