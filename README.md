@@ -57,7 +57,9 @@ For example:
 module "ec2_myserver" {
   source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
 
-  key_name        = "${var.useful_thing}"
+  ami             = data.aws_ami.linux.id
+  iam_role        = "iam_role_name"
+  key_pair        = "${var.useful_thing}"
   instance_type   = "t3a.small"
   vpc_id          = "a-12345678"
   security_groups = ["sg_windows"]
@@ -75,7 +77,9 @@ Full example
 module "ec2_myserver" {
   source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
 
-  key_name        = var.my_key
+  ami             = data.aws_ami.linux.id
+  iam_role        = "iam_role_name"    
+  key_pair        = var.my_key
   instance_type   = "t3a.small"
   vpc_id          = "a-e343434334"
   security_groups = ["sg_windows"]
