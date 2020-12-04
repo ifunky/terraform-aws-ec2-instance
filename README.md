@@ -92,7 +92,7 @@ module "ec2_myserver" {
   namespace       = "ifunky"
   stage           = "dev"
 
-  metadata {
+  metadata_options {
     enabled                 = true
     require_session_tokens  = true # Use metadata service V2
     http_hop_limit          = 1

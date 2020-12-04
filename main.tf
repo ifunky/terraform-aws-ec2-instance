@@ -79,7 +79,7 @@ resource "aws_instance" "default" {
 
   metadata_options {
     http_endpoint               = local.metadata_enabled
-    http_tokens                 = var.metadata_options.require_session_tokens
+    http_tokens                 = local.metadata_tokens
     http_put_response_hop_limit = var.metadata_options.http_hop_limit
   }
 
