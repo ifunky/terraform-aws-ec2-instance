@@ -11,7 +11,7 @@ locals {
   ebs_iops             = var.ebs_volume_type == "io1" ? var.ebs_iops : "0"
   ami                  = var.ami
   metadata_enabled     = var.metadata_options.enabled ? "enabled" : "disabled"
-  metadata_tokens      = var.metadata_options.require_session_tokens ? "required" : "optional"
+  metadata_tokens      = var.metadata_options.require_session_tokens ? "required" : "optional" #tfsec:ignore:GEN002
 }
 
 module "label" {
@@ -33,7 +33,7 @@ resource "aws_instance" "default" {
   disable_api_termination     = var.disable_api_termination
   user_data                   = templatefile("${path.module}/userdata_windows.tmpl", { user_data = var.user_data, block_devices = var.ebs_block_device })
   iam_instance_profile        = var.iam_role
-  associate_public_ip_address = var.associate_public_ip_address
+  associate_public_ip_address = var.associate_public_ip_address #tfsec:ignore:AWS012
   key_name                    = var.key_pair
   subnet_id                   = var.subnet
   monitoring                  = var.detailed_monitoring

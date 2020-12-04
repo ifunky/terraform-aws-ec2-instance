@@ -24,6 +24,7 @@ validate: init
 	@terraform validate
 	@echo Running lint checks on Terraform code....
 	@tflint
+	@tfsec .
 
 createdocs/targets: # Create list of make targets in Markdown format
 	@echo Auto creating README.md....
