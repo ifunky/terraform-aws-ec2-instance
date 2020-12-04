@@ -10,6 +10,8 @@ locals {
   availability_zone    = var.availability_zone != "" ? var.availability_zone : data.aws_subnet.default.availability_zone
   ebs_iops             = var.ebs_volume_type == "io1" ? var.ebs_iops : "0"
   ami                  = var.ami
+  metadata_enabled     = var.metadata_options.enabled ? "enabled" : "disabled"
+  metadata_tokens      = var.metadata_options.require_session_tokens ? "required" : "optional"
 }
 
 module "label" {
@@ -74,6 +76,12 @@ resource "aws_instance" "default" {
 
   tags                    = merge(map( "Name", var.name), var.tags)
   volume_tags             = module.label.tags
+
+  metadata_options {
+    http_endpoint               = local.metadata_enabled
+    http_tokens                 = var.metadata_options.require_session_tokens
+    http_put_response_hop_limit = var.metadata_options.http_hop_limit
+  }
 
   lifecycle {
     # Due to several known issues in Terraform AWS provider related to arguments of aws_instance:

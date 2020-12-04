@@ -29,6 +29,10 @@ description: |-
   - Optionally join a domain using SSM documents (see notes below)
   - Attach 1 or more additional EBS volumes
 
+  ### Instance Meta Data Service Support
+  - Support metadata IMDSv1 and IMDSv2
+  - For better security the default is IMDSv2.  Using IMDSv1 will show up as "High" in SecurityHub
+
   ### User Data
   - Specify optional user data scripts
 
@@ -99,6 +103,12 @@ usage: |-
     namespace       = "ifunky"
     stage           = "dev"
 
+    metadata {
+      enabled                 = true
+      require_session_tokens  = true # Use metadata service V2
+      http_hop_limit          = 1
+    }
+
     user_data       =<<EOF
         echo "test" > c:\windows\temp\log1.log
         echo "test2" > c:\windows\temp\log2.log
@@ -153,6 +163,9 @@ references:
   - name: "AWS Windows Device Mapping"
     description: "AWS Windows Volume Mapping"
     url: "https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html#windows-volume-mapping" 
+  - name: "AWS Metadata Service"
+    description: "Metadata Official Docs"
+    url: "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html" 
   - name: "Terraform EC2 Instance"
     description: "Terraform EC2 documentation"
     url: "https://www.terraform.io/docs/providers/aws/r/instance.html" 

@@ -32,6 +32,7 @@ Provider Requirements:
 * `join_domain_ssm_document` (required): SSM document name that will be used for joining the domain
 * `join_domain_ssm_params` (required): Parameters to pass into the join domain SSM document.
 * `key_pair` (required): Key pair used to when provisioning the instance
+* `metadata_options` (default `{"enabled":true,"http_hop_limit":1,"require_session_tokens":false}`): Set instance metadata options
 * `name` (required): Solution name, e.g. 'app' or 'jenkins'
 * `namespace` (required): Namespace, which could be your organization name or abbreviation, e.g. 'ifunky' or 'WonkaCo'
 * `os_type` (default `"linux"`): Type of OS. Either linux or windows

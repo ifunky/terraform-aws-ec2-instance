@@ -232,3 +232,14 @@ variable "delete_on_termination" {
   description = "Whether the volume should be destroyed on instance termination"
   default     = true
 }
+
+variable "metadata_options" {
+  description = "Set instance metadata options"
+  type = object({ enabled=bool, require_session_tokens=bool, http_hop_limit=number })
+  default     = {
+                enabled                = true
+                require_session_tokens = false  # Default to metadata V1
+                http_hop_limit         = 1
+              }
+              
+}

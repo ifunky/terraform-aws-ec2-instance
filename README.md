@@ -17,6 +17,10 @@ This module creates Linux or Windows EC2 instances.
 - Optionally join a domain using SSM documents (see notes below)
 - Attach 1 or more additional EBS volumes
 
+### Instance Meta Data Service Support
+- Support metadata IMDSv1 and IMDSv2
+- For better security the default is IMDSv2.  Using IMDSv1 will show up as "High" in SecurityHub
+
 ### User Data
 - Specify optional user data scripts
 
@@ -87,6 +91,12 @@ module "ec2_myserver" {
   name            = "My_Server"
   namespace       = "ifunky"
   stage           = "dev"
+
+  metadata {
+    enabled                 = true
+    require_session_tokens  = true # Use metadata service V2
+    http_hop_limit          = 1
+  }
 
   user_data       =<<EOF
       echo "test" > c:\windows\temp\log1.log
@@ -170,6 +180,7 @@ Provider Requirements:
 * `join_domain_ssm_document` (required): SSM document name that will be used for joining the domain
 * `join_domain_ssm_params` (required): Parameters to pass into the join domain SSM document.
 * `key_pair` (required): Key pair used to when provisioning the instance
+* `metadata_options` (default `{"enabled":true,"http_hop_limit":1,"require_session_tokens":false}`): Set instance metadata options
 * `name` (required): Solution name, e.g. 'app' or 'jenkins'
 * `namespace` (required): Namespace, which could be your organization name or abbreviation, e.g. 'ifunky' or 'WonkaCo'
 * `os_type` (default `"linux"`): Type of OS. Either linux or windows
@@ -227,5 +238,6 @@ For more information please see the following links of interest:
 
 - [AWS Windows User Data](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-user-data.html) - AWS Windows User Data guide
 - [AWS Windows Device Mapping](https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html#windows-volume-mapping) - AWS Windows Volume Mapping
+- [AWS Metadata Service](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) - Metadata Official Docs
 - [Terraform EC2 Instance](https://www.terraform.io/docs/providers/aws/r/instance.html) - Terraform EC2 documentation
 
