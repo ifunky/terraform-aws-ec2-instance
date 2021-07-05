@@ -75,7 +75,7 @@ resource "aws_instance" "default" {
   }
 
   tags                    = merge(map( "Name", var.name), var.tags)
-  volume_tags             = module.label.tags
+  volume_tags             = var.tags
 
   metadata_options {
     http_endpoint               = local.metadata_enabled
