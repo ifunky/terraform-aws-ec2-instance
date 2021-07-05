@@ -99,7 +99,7 @@ resource "aws_eip" "default" {
   count    = var.associate_public_ip_address && var.assign_eip_address && var.enabled ? 1 : 0
   instance = aws_instance.default[count.index].id
   vpc      = true
-  tags     = module.label.tags
+  tags     = var.tags
 }
 
 resource "aws_ebs_volume" "default" {
@@ -108,7 +108,7 @@ resource "aws_ebs_volume" "default" {
   size              = var.ebs_volume_size
   iops              = local.ebs_iops
   type              = var.ebs_volume_type
-  tags              = module.label.tags
+  tags              = var.tags
 }
 
 resource "aws_volume_attachment" "default" {
