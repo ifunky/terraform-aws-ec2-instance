@@ -149,10 +149,10 @@ polydev                        Run PolyDev interactive shell to start developing
 # Module Specifics
 
 Core Version Constraints:
-* `~> 0.12.20`
+* `~> 0.13.5`
 
 Provider Requirements:
-* **aws:** `~> 2.16`
+* **aws:** `~> 3.0`
 
 ## Input Variables
 * `ami` (required): The AMI to use for the instance
