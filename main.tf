@@ -31,7 +31,7 @@ resource "aws_instance" "default" {
   instance_type               = var.instance_type
   ebs_optimized               = var.ebs_optimized
   disable_api_termination     = var.disable_api_termination
-  user_data                   = templatefile("${path.module}/userdata_windows.tmpl", { user_data = var.user_data, block_devices = var.ebs_block_device })
+  user_data                   = templatefile("${path.module}/userdata_${var.os_type}.tmpl", { user_data = var.user_data, block_devices = var.ebs_block_device })
   iam_instance_profile        = var.iam_role
   associate_public_ip_address = var.associate_public_ip_address #tfsec:ignore:AWS012
   key_name                    = var.key_pair
@@ -74,7 +74,7 @@ resource "aws_instance" "default" {
     }
   }
 
-  tags                    = merge(map( "Name", var.name), var.tags)
+  tags                    = merge(tomap({ "Name" = var.name}), var.tags)
   volume_tags             = var.tags
 
   metadata_options {

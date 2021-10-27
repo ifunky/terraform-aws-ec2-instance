@@ -90,6 +90,11 @@ variable "os_type" {
   type        = string
   description = "Type of OS. Either linux or windows"
   default     = "linux"
+
+  validation {
+    condition = contains(["linux", "windows"], var.os_type)
+    error_message = "Varible os_type must be \"linux\" or \"windows\"."
+  }  
 }
 
 variable "root_block_device" {
