@@ -82,6 +82,7 @@ usage: |-
     name            = "My_Server"
     namespace       = "ifunky"
     stage           = "dev"
+    
     tags = {
       Terraform = "true"
     }
@@ -89,10 +90,20 @@ usage: |-
   ```
   Full example
   ```hcl
-  module "ec2_myserver" {
+
+  data "aws_ami" "windows_2022" {
+    most_recent = true
+    owners      = ["amazon"]
+    filter {
+      name   = "name"
+      values = ["Windows_Server-2022-English-Full-Base*"]
+    }
+  }
+
+  module "ec2_my_windows_server" {
     source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=master"
 
-    ami             = data.aws_ami.linux.id
+    ami             = data.aws_ami.windows_2022.id
     iam_role        = "iam_role_name"    
     key_pair        = var.my_key
     instance_type   = "t3a.small"
@@ -103,7 +114,7 @@ usage: |-
     namespace       = "ifunky"
     stage           = "dev"
 
-    metadata_options {
+    metadata_options = {
       enabled                 = true
       require_session_tokens  = true # Use metadata service V2
       http_hop_limit          = 1
@@ -143,6 +154,56 @@ usage: |-
       Terraform = "true"
     }
   }
+
+  module "ec2_my_linux_server" {
+    source = "git::https://github.com/ifunky/terraform-aws-ec2-instance?ref=main"
+
+    ami             = data.aws_ami.windows_2022.id
+    iam_role        = "iam_role_name"    
+    key_pair        = var.my_key
+    instance_type   = "t3a.small"
+    vpc_id          = "a-e343434334"
+    security_groups = ["sg_linux"]
+    subnet          = "i-573443ww"
+    name            = "My_Server"
+    namespace       = "ifunky"
+    stage           = "dev"
+
+    metadata_options = {
+      enabled                 = true
+      require_session_tokens  = true # Use metadata service V2
+      http_hop_limit          = 1
+    }
+
+    user_data       =<<EOF
+    EOF
+
+    join_domain               = true
+    join_domain_ssm_document  = "awsconfig_Domain_d-34343434_ifunky.com"
+    join_domain_ssm_params    = {
+      ServerName = "MyServerName"
+    }
+
+    ebs_block_device = [
+              {
+                device_name           = "/dev/sdh"
+                volume_type           = "gp3"
+                volume_size           = 5
+                delete_on_termination = true
+              },
+              {
+                device_name           = "/dev/sdj"
+                volume_type           = "gp3"
+                volume_size           = 5
+                delete_on_termination = true
+              },
+      ]
+
+    tags = {
+      Terraform = "true"
+    }
+  }
+
   ```
 
 # Include output from terraform-module-inspect
@@ -160,6 +221,9 @@ references:
   - name: "AWS Windows User Data"
     description: "AWS Windows User Data guide"
     url: "https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-user-data.html" 
+  - name: "AWS Device Mapping Guide"
+    description: "General device mapping concepts"
+    url: "https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/block-device-mapping-concepts.html"
   - name: "AWS Windows Device Mapping"
     description: "AWS Windows Volume Mapping"
     url: "https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html#windows-volume-mapping" 
