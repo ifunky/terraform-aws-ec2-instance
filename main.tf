@@ -98,7 +98,7 @@ resource "aws_instance" "default" {
 resource "aws_eip" "default" {
   count    = var.associate_public_ip_address && var.assign_eip_address && var.enabled ? 1 : 0
   instance = aws_instance.default[count.index].id
-  vpc      = true
+  domain   = "vpc"
   tags     = var.tags
 }
 
